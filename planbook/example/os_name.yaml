@@ -1,0 +1,16 @@
+---
+- name: Check os Name
+  shell: cat /etc/os-release | egrep ^NAME | awk -F "=" '{ print $2 }' | sed s/\"//g
+  register: os_name
+
+- name: setup db
+  apt:
+    name: mysql-server
+  become: yes
+  when: not mysql_installed.stat.exists and os_name.stdout == "Ubuntu"
+
+- name: "setup db"
+  yum:
+    name: mysql-server
+  become: yes
+  when: not mysql_installed.stat.exists and os_name.stdout == "CentOS Linux"
